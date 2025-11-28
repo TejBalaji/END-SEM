@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Attendance App</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+
+function attendanceReducer(state, action) {
+  switch (action.type) {
+    case "MARK_PRESENT":
+      return state.map(s =>
+        s.id === action.id ? { ...s, status: "Present" } : s
+      );
+
+    case "MARK_ABSENT":
+      return state.map(s =>
+        s.id === action.id ? { ...s, status: "Absent" } : s
+      );
+
+    case "RESET_LIST":
+      return state.map(s => ({ ...s, status: "Not Marked" }));
+
+    default:
+      return state;
+  }
+}
+
+function App() {
+  const initialStudents = [
+    { id: 1, name: "Akhil", status: "Not Marked" },
+    { id: 2, name: "Meena", status: "Not Marked" },
+    { id: 3, name: "Ravi", status: "Not Marked" }
+  ];
+
+  const [students, dispatch] = React.useReducer(attendanceReducer, initialStudents);
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <h2>Classroom Attendance</h2>
+
+      {students.map(student => (
+        <div key={student.id} style={{ marginBottom: "10px" }}>
+          <strong>{student.name}</strong> — {student.status}
+          <button onClick={() => dispatch({ type: "MARK_PRESENT", id: student.id })}>
+            Present
+          </button>
+          <button onClick={() => dispatch({ type: "MARK_ABSENT", id: student.id })}>
+            Absent
+          </button>
+        </div>
+      ))}
+
+      <button onClick={() => dispatch({ type: "RESET_LIST" })}>
+        Reset Attendance
+      </button>
+
+      <h3>Final Attendance</h3>
+      <ul>
+        {students.map(s => (
+          <li key={s.id}>{s.name} — {s.status}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+</script>
+</body>
+</html>
